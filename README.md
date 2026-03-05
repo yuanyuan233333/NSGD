@@ -214,4 +214,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**⭐ If you find this project useful, please star it!**
+
