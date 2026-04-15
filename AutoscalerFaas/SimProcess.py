@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import expon, poisson, norm, pareto
+import math
 
 from AutoscalerFaasParallel.Utility import convert_hist_pdf
 
@@ -127,9 +128,12 @@ which can be used for visualization purposes.
         return expon.cdf(x, scale=1/self.rate)
 
     def generate_trace(self):
-        if self.rate < 0:
-            print("RATE", self.rate)
-        return self.rangen.exponential(1/self.rate)
+        # if self.rate < 0:
+        #     print("RATE", self.rate)
+        # return self.rangen.exponential(1/self.rate)
+        
+        u = self.rangen.random()  # uniform [0,1)
+        return -math.log(1 - u) / self.rate
 
 
 class ConstSimProcess(SimProcess):

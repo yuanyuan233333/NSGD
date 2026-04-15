@@ -24,7 +24,6 @@ FunctionInstance::FunctionInstance(double creation_t,
           m_next_termination = std::numeric_limits<double>::infinity();
 
           generate_init_departure(creation_t);
-          update_next_termination();
 }
 
 //cold 到 init free 安排init 完成时间
@@ -32,7 +31,6 @@ void FunctionInstance::make_Init_Free(double t){
     if (m_state != FunctionState::COLD)
         throw std::runtime_error("make_Init_Free() requires state COLD");
     m_state = FunctionState::INIT_FREE;
-    generate_init_departure(t);
 }
 
 // cold到 init reserved 安排init 完成时间并标记为已预订
@@ -41,7 +39,6 @@ void FunctionInstance::make_Init_Reserved(double t) {
         throw std::runtime_error("make_init_Reserved() requires state COLD");
     m_state = FunctionState::INIT_RESERVED;
     m_reserved = true;
-    generate_init_departure(t);
 }
 
 //仅在init free 可预订

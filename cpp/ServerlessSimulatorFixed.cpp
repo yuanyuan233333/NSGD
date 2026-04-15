@@ -150,7 +150,6 @@ int ServerlessSimulator::pick_newest_init_free() const {
 }
 
 void ServerlessSimulator::update_hist_arrays(double t) {
-    hist_.times.push_back(t);
     hist_.server_count.push_back(server_count_);
     hist_.running_count.push_back(running_count_);
     hist_.idle_count.push_back(idle_count_);
@@ -267,7 +266,6 @@ void ServerlessSimulator::init_free_arrival(double t, int theta) {
     servers_[idx].arrival_transition(t);
     --init_free_count_;
     ++init_free_booked_;
-    ++stats_.total_cold;
     if (!hist_.times.empty())
         hist_.req_queued_idx.push_back((int)hist_.times.size() - 1);
 
@@ -305,8 +303,6 @@ void ServerlessSimulator::cold_start_arrival(double t, int theta) {
 }
 
 void ServerlessSimulator::run(bool progress, bool debug) {
-    auto step = algo_.get_theta_step();
-    start_init_free_servers(t_, step[0], "bootstrap");
 
     while (algo_.running_condition()) {
         // Find next instance event
@@ -327,7 +323,7 @@ void ServerlessSimulator::run(bool progress, bool debug) {
             hist_.times.push_back(t_);
             update_hist_arrays(t_);
 
-            step = algo_.get_theta_step();
+            auto step = algo_.get_theta_step();
             int theta = step[0];
 
             if (is_warm_available()) {
@@ -380,6 +376,7 @@ void ServerlessSimulator::run(bool progress, bool debug) {
             }
         } else if (new_state == FunctionState::BUSY) {
             if (old_state == FunctionState::INIT_RESERVED) {
+                servers_[min_idx].update_next_transition(t_);
                 --init_reserved_count_;
                 ++running_count_;
             } else if (old_state == FunctionState::INIT_FREE && servers_[min_idx].is_reserved()) {
@@ -388,8 +385,6 @@ void ServerlessSimulator::run(bool progress, bool debug) {
 
                 --init_free_booked_;
                 --queued_jobs_count_;
-                ++stats_.total_warm;
-                hist_.req_warm_idx.push_back((int)hist_.times.size() - 1);
                 ++running_count_;
             }
         }

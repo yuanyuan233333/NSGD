@@ -34,18 +34,19 @@ private:
 class ExpSimProcess : public SimProcess {
 public:
     explicit ExpSimProcess(double rate, unsigned seed = std::random_device{}()):
-    m_rate(rate), m_gen(seed), m_dist(rate) {
+    m_rate(rate), m_gen(seed) {
         if (m_rate <= 0.0)
             throw std::invalid_argument("ExpSimProcess: rate must be > 0");
     }
 
     double sample() const override {
-        return m_dist (const_cast<std::mt19937&>(m_gen));
+        auto& g = const_cast<std::mt19937&>(m_gen);
+        double u = (g() + 0.5) / 4294967296.0;
+        return -std::log(u) / m_rate;
     }
 private:
     double m_rate;
     mutable std::mt19937 m_gen;
-    mutable std::exponential_distribution<double> m_dist;
 };
 
 //pareto 分布

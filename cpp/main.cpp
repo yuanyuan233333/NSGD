@@ -38,8 +38,6 @@ int main(int argc, char** argv) {
     double warm_rate          = cfg["warm_service"]["rate"];
     double cold_service_rate  = cfg["cold_service"]["rate"];
     double cold_start_rate    = cfg["cold_start"]["rate"];
-    double expiration_rate    = cfg["expiration"]["rate"];
-
     // --- theta 初始值: [[theta, theta_min, gamma_exp]] ---
     auto theta_json = cfg["theta"][0];
     std::array<double,3> theta_init{
@@ -54,6 +52,10 @@ int main(int argc, char** argv) {
     double T_max      = cfg["max_time"];
     int    K          = cfg["K"];
     double k_delta    = cfg["k_delta"];
+    double K_exp      = cfg.value("K_exp", 1000.0);
+
+    // Compute expiration rate from theta_init[2] / K_exp, matching Python
+    double expiration_rate = theta_init[2] / K_exp;
 
     std::array<double,3> k_gamma{
             cfg["k_gamma"][0].get<double>(),
